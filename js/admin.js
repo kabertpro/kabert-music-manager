@@ -154,7 +154,7 @@ async function renderEstudiantesView() {
 
 async function cargarTablaEstudiantes(filtro) {
   const tbody = document.getElementById("estudiantesTbody");
-  let query = supabase.from("estudiantes").select("*").order("nombre_completo");
+  let query = supabaseClient.from("estudiantes").select("*").order("nombre_completo");
   const { data, error } = await query;
   if (error) { tbody.innerHTML = `<tr><td colspan="6" class="empty-state">Error al cargar estudiantes.</td></tr>`; return; }
 
@@ -194,7 +194,7 @@ async function cargarTablaEstudiantes(filtro) {
 
 async function toggleEstadoEstudiante(est) {
   const nuevoEstado = est.estado === "activo" ? "baja" : "activo";
-  await supabase.from("estudiantes").update({ estado: nuevoEstado }).eq("id", est.id);
+  await supabaseClient.from("estudiantes").update({ estado: nuevoEstado }).eq("id", est.id);
   await registrarHistorial(est.id, nuevoEstado === "baja" ? "baja" : "reactivacion",
     nuevoEstado === "baja" ? "Estudiante dado de baja" : "Estudiante reactivado");
   toast(nuevoEstado === "baja" ? "Estudiante dado de baja." : "Estudiante reactivado.", "success");
@@ -202,7 +202,7 @@ async function toggleEstadoEstudiante(est) {
 }
 
 async function verEstudiante(est) {
-  const { data: historial } = await supabase.from("historial").select("*").eq("estudiante_id", est.id).order("fecha", { ascending: false }).limit(30);
+  const { data: historial } = await supabaseClient.from("historial").select("*").eq("estudiante_id", est.id).order("fecha", { ascending: false }).limit(30);
   openModal({
     title: est.nombre_completo,
     bodyHtml: `
@@ -303,11 +303,11 @@ async function guardarEstudiante(est) {
 
   try {
     if (est) {
-      await supabase.from("estudiantes").update(payload).eq("id", est.id).select();
+      await supabaseClient.from("estudiantes").update(payload).eq("id", est.id).select();
     } else {
       payload.codigo = await generarCodigoUnico(nombre);
       payload.fecha_inicio_mensualidad = payload.fecha_ingreso;
-      const { data: nuevo, error } = await supabase.from("estudiantes").insert(payload).select().single();
+      const { data: nuevo, error } = await supabaseClient.from("estudiantes").insert(payload).select().single();
       if (error) throw error;
       await generarCalendarioInicial(nuevo);
       await registrarHistorial(nuevo.id, "alta", "Estudiante registrado en el sistema");
@@ -326,7 +326,7 @@ async function generarCodigoUnico(nombre) {
   let candidato = base;
   let n = 1;
   while (true) {
-    const { data } = await supabase.from("estudiantes").select("id").eq("codigo", candidato).maybeSingle();
+    const { data } = await supabaseClient.from("estudiantes").select("id").eq("codigo", candidato).maybeSingle();
     if (!data) return candidato;
     n++;
     candidato = `${base}${n}`;
@@ -339,10 +339,10 @@ async function renderPagosView() {
   el.innerHTML = `<div class="empty-state">Cargando pagos…</div>`;
 
   const hoyISO = toISODate(new Date());
-  const { data: estudiantes } = await supabase.from("estudiantes").select("*").eq("estado", "activo").order("nombre_completo");
+  const { data: estudiantes } = await supabaseClient.from("estudiantes").select("*").eq("estado", "activo").order("nombre_completo");
   const pendientes = (estudiantes || []).filter(e => e.saldo_pendiente > 0 || debeCobrarHoy(e, hoyISO));
 
-  const { data: pagos } = await supabase.from("pagos").select("*, estudiantes(nombre_completo,codigo)").order("fecha", { ascending: false }).limit(40);
+  const { data: pagos } = await supabaseClient.from("pagos").select("*, estudiantes(nombre_completo,codigo)").order("fecha", { ascending: false }).limit(40);
 
   el.innerHTML = `
     <div class="section-head"><h3>Mensualidades pendientes</h3></div>
@@ -386,7 +386,7 @@ async function renderPagosView() {
     const tr = btn.closest("tr");
     const pago = pagos.find(p => p.id === tr.dataset.id);
     btn.addEventListener("click", async () => {
-      const { data: est } = await supabase.from("estudiantes").select("*").eq("id", pago.estudiante_id).maybeSingle();
+      const { data: est } = await supabaseClient.from("estudiantes").select("*").eq("id", pago.estudiante_id).maybeSingle();
       generarReciboPDF(pago, est || { nombre_completo: pago.estudiantes?.nombre_completo, codigo: pago.estudiantes?.codigo }, nombreEspecialidad(est?.especialidad_id), state.configuracion);
     });
   });
@@ -449,7 +449,7 @@ async function renderEspecialidadesView() {
 }
 
 async function pintarEspecialidades() {
-  const { data } = await supabase.from("especialidades").select("*").order("nombre");
+  const { data } = await supabaseClient.from("especialidades").select("*").order("nombre");
   state.especialidades = data || [];
   document.getElementById("espTbody").innerHTML = state.especialidades.map(e => `
     <tr data-id="${e.id}">
@@ -462,14 +462,14 @@ async function pintarEspecialidades() {
     const tr = btn.closest("tr");
     const esp = state.especialidades.find(e => e.id === tr.dataset.id);
     btn.addEventListener("click", async () => {
-      await supabase.from("especialidades").update({ activo: !esp.activo }).eq("id", esp.id);
+      await supabaseClient.from("especialidades").update({ activo: !esp.activo }).eq("id", esp.id);
       pintarEspecialidades();
     });
   });
 }
 
 async function crearEspecialidad(nombre) {
-  const { error } = await supabase.from("especialidades").insert({ nombre });
+  const { error } = await supabaseClient.from("especialidades").insert({ nombre });
   if (error) { toast("No se pudo crear (¿nombre repetido?).", "error"); return; }
   toast("Especialidad creada.", "success");
   pintarEspecialidades();
@@ -496,7 +496,7 @@ async function renderConfiguracionView() {
       moneda: document.getElementById("cMoneda").value.trim() || "Bs",
       logo_url: document.getElementById("cLogo").value.trim()
     };
-    const { error } = await supabase.from("configuracion").update(payload).eq("id", 1);
+    const { error } = await supabaseClient.from("configuracion").update(payload).eq("id", 1);
     if (error) { document.getElementById("cError").textContent = "Error al guardar."; return; }
     state.configuracion = { ...c, ...payload };
     toast("Configuración guardada.", "success");

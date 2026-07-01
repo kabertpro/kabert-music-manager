@@ -108,8 +108,8 @@ async function entrarComoEstudiante() {
 
 async function cargarDatosBase() {
   const [{ data: esp }, { data: config }] = await Promise.all([
-    supabase.from("especialidades").select("*").order("nombre"),
-    supabase.from("configuracion").select("*").eq("id", 1).maybeSingle()
+    supabaseClient.from("especialidades").select("*").order("nombre"),
+    supabaseClient.from("configuracion").select("*").eq("id", 1).maybeSingle()
   ]);
   state.especialidades = esp || [];
   state.configuracion = config || { nombre_institucion: "Escuela de Música Kabert" };

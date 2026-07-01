@@ -40,7 +40,7 @@ async function registrarPago(estudiante, monto, tipo, observaciones) {
     if (siguienteCiclo) update.proxima_mensualidad = siguienteCiclo;
   }
 
-  await supabase.from("estudiantes").update(update).eq("id", estudiante.id);
+  await supabaseClient.from("estudiantes").update(update).eq("id", estudiante.id);
 
   await registrarHistorial(estudiante.id, "pago",
     `Pago ${tipo === "completo" ? "completo" : "parcial"} de ${estudiante.moneda || "Bs"} ${monto} — recibo ${numeroRecibo}`);

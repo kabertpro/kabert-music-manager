@@ -27,7 +27,7 @@ async function generarCalendarioInicial(estudiante) {
     estado: "programada"
   }));
 
-  const { error } = await supabase.from("eventos_calendario").insert(eventos);
+  const { error } = await supabaseClient.from("eventos_calendario").insert(eventos);
   if (error) throw error;
 
   // La primera fecha de clase es también la primera fecha de cobro
@@ -67,7 +67,7 @@ async function extenderCalendarioSiNecesario(estudiante) {
     hora_fin: estudiante.hora_fin,
     estado: "programada"
   }));
-  await supabase.from("eventos_calendario").insert(eventos);
+  await supabaseClient.from("eventos_calendario").insert(eventos);
 }
 
 /** Marca una clase como "Asistió". No afecta la mensualidad. */
@@ -123,7 +123,7 @@ async function registrarPermiso(evento, estudiante, conReposicion) {
   const fechaReposicion = siguienteFechaClase(baseFecha, estudiante.dias_clase);
   if (!fechaReposicion) return;
 
-  await supabase.from("eventos_calendario").insert({
+  await supabaseClient.from("eventos_calendario").insert({
     estudiante_id: estudiante.id,
     fecha: fechaReposicion,
     hora_inicio: estudiante.hora_inicio,
@@ -147,7 +147,7 @@ async function registrarPermiso(evento, estudiante, conReposicion) {
 }
 
 async function registrarHistorial(estudianteId, tipo, descripcion) {
-  await supabase.from("historial").insert({
+  await supabaseClient.from("historial").insert({
     estudiante_id: estudianteId,
     tipo,
     descripcion

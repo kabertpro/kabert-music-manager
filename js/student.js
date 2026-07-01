@@ -43,7 +43,7 @@ function renderPerfilView() {
     };
     const nuevaPass = document.getElementById("pPassword").value;
     if (nuevaPass) payload.password = nuevaPass;
-    const { error } = await supabase.from("estudiantes").update(payload).eq("id", e.id);
+    const { error } = await supabaseClient.from("estudiantes").update(payload).eq("id", e.id);
     if (error) { document.getElementById("pError").textContent = "Error al guardar los cambios."; return; }
     state.estudiante = { ...e, ...payload };
     toast("Perfil actualizado.", "success");
@@ -89,7 +89,7 @@ async function renderHistorialEstudianteView() {
   const e = state.estudiante;
   const el = document.getElementById("studentContent");
   el.innerHTML = `<div class="empty-state">Cargando historial…</div>`;
-  const { data: historial } = await supabase.from("historial").select("*").eq("estudiante_id", e.id).order("fecha", { ascending: false });
+  const { data: historial } = await supabaseClient.from("historial").select("*").eq("estudiante_id", e.id).order("fecha", { ascending: false });
 
   el.innerHTML = `
     <div style="display:flex;flex-direction:column;gap:10px">
@@ -107,7 +107,7 @@ async function renderMensualidadesEstudianteView() {
   const el = document.getElementById("studentContent");
   el.innerHTML = `<div class="empty-state">Cargando mensualidades…</div>`;
 
-  const { data: pagos } = await supabase.from("pagos").select("*").eq("estudiante_id", e.id).order("fecha", { ascending: false });
+  const { data: pagos } = await supabaseClient.from("pagos").select("*").eq("estudiante_id", e.id).order("fecha", { ascending: false });
 
   const deuda = e.saldo_pendiente > 0 ? e.saldo_pendiente : 0;
 
