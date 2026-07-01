@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+<title>Kabert Music Manager · Escuela de Música Kabert</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- ================= SPLASH ================= -->
+<div id="splashScreen">
+  <div class="splash-staff">
+    <span></span><span></span><span></span><span></span><span></span>
+    <div class="splash-note"></div>
+  </div>
+  <div class="splash-title">Escuela de Música Kabert</div>
+  <div class="splash-sub">Sistema de Gestión Académica</div>
+  <div class="splash-brand">by LMKE</div>
+</div>
+
+<!-- ================= AUTH: STUDENT LOGIN ================= -->
+<div id="studentAuthScreen" class="auth-shell hidden">
+  <div class="auth-card">
+    <h1>Portal del Estudiante</h1>
+    <p class="sub">Escuela de Música Kabert</p>
+    <form id="studentLoginForm">
+      <div class="field">
+        <label>Usuario</label>
+        <input type="text" id="studentUser" autocomplete="username" required />
+      </div>
+      <div class="field">
+        <label>Contraseña</label>
+        <input type="password" id="studentPass" autocomplete="current-password" required />
+      </div>
+      <button type="submit" class="btn btn-primary">Ingresar</button>
+      <div class="error-msg" id="studentLoginError"></div>
+    </form>
+  </div>
+  <button class="admin-trigger" id="adminTriggerBtn" title="Administración">⚙</button>
+</div>
+
+<!-- ================= AUTH: ADMIN PASSWORD GATE ================= -->
+<div id="adminAuthScreen" class="auth-shell hidden">
+  <div class="auth-card">
+    <h1>Administración</h1>
+    <p class="sub">Acceso restringido</p>
+    <form id="adminLoginForm">
+      <div class="field">
+        <label>Contraseña de administrador</label>
+        <input type="password" id="adminPass" autocomplete="current-password" required />
+      </div>
+      <button type="submit" class="btn btn-primary">Ingresar</button>
+      <div class="error-msg" id="adminLoginError"></div>
+    </form>
+    <div class="auth-switch">
+      <button type="button" id="backToStudentLogin">← Volver al Portal del Estudiante</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= APP SHELL: ADMIN ================= -->
+<div id="adminApp" class="app-shell hidden">
+  <div class="sidebar-scrim hidden" id="sidebarScrim"></div>
+  <aside class="sidebar" id="adminSidebar">
+    <div class="brand">
+      <div class="brand-mark">KM</div>
+      <div class="brand-text">Kabert Music Manager<small>KABERT STUDIO · LMKE</small></div>
+    </div>
+    <button class="nav-item active" data-view="dashboard">📅 <span>Agenda del Día</span></button>
+    <button class="nav-item" data-view="estudiantes">🎓 <span>Estudiantes</span></button>
+    <button class="nav-item" data-view="pagos">💳 <span>Pagos</span></button>
+    <button class="nav-item" data-view="especialidades">🎼 <span>Especialidades</span></button>
+    <button class="nav-item" data-view="configuracion">⚙️ <span>Configuración</span></button>
+    <div class="sidebar-footer">
+      <button class="btn btn-ghost btn-sm" style="width:100%" id="adminLogoutBtn">Salir del panel</button>
+    </div>
+  </aside>
+  <div class="main">
+    <div class="mobile-topbar">
+      <button id="adminMenuBtn">☰</button>
+      <strong style="font-family:var(--f-display)">Kabert Music Manager</strong>
+    </div>
+    <div class="topbar">
+      <h2 id="adminViewTitle">Agenda del Día</h2>
+      <span class="date-chip" id="adminDateChip"></span>
+    </div>
+    <div class="content" id="adminContent"></div>
+  </div>
+</div>
+
+<!-- ================= APP SHELL: STUDENT PORTAL ================= -->
+<div id="studentApp" class="app-shell hidden">
+  <div class="sidebar-scrim hidden" id="sidebarScrimStudent"></div>
+  <aside class="sidebar" id="studentSidebar">
+    <div class="brand">
+      <div class="brand-mark">KM</div>
+      <div class="brand-text">Kabert Music Manager<small>KABERT STUDIO · LMKE</small></div>
+    </div>
+    <button class="nav-item active" data-view="perfil">👤 <span>Mi Perfil</span></button>
+    <button class="nav-item" data-view="horarios">🗓️ <span>Horarios</span></button>
+    <button class="nav-item" data-view="historial">📜 <span>Historial</span></button>
+    <button class="nav-item" data-view="mensualidades">💳 <span>Mensualidades</span></button>
+    <div class="sidebar-footer">
+      <button class="btn btn-ghost btn-sm" style="width:100%" id="studentLogoutBtn">Cerrar sesión</button>
+    </div>
+  </aside>
+  <div class="main">
+    <div class="mobile-topbar">
+      <button id="studentMenuBtn">☰</button>
+      <strong style="font-family:var(--f-display)">Kabert Music Manager</strong>
+    </div>
+    <div class="topbar">
+      <h2 id="studentViewTitle">Mi Perfil</h2>
+      <span class="date-chip" id="studentDateChip"></span>
+    </div>
+    <div class="content" id="studentContent"></div>
+  </div>
+</div>
+
+<div id="modalRoot"></div>
+<div id="toastContainer"></div>
+
+<!-- Vendor -->
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<!-- App -->
+<script src="js/supabaseClient.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/calendarEngine.js"></script>
+<script src="js/payments.js"></script>
+<script src="js/admin.js"></script>
+<script src="js/student.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
