@@ -28,7 +28,7 @@ async function renderDashboardAgenda() {
   el.innerHTML = `<div class="empty-state">Cargando agenda…</div>`;
 
   const hoyISO = toISODate(new Date());
-  const { data: eventos, error } = await supabase
+  const { data: eventos, error } = await supabaseClient
     .from("eventos_calendario")
     .select("*, estudiantes(*)")
     .eq("fecha", hoyISO)

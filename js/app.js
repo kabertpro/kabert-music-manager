@@ -58,7 +58,7 @@ function wireAuthScreens() {
     const errEl = document.getElementById("studentLoginError");
     errEl.textContent = "";
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseClient
         .from("estudiantes")
         .select("*")
         .eq("usuario", usuario)

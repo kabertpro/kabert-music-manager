@@ -32,7 +32,7 @@ async function generarCalendarioInicial(estudiante) {
 
   // La primera fecha de clase es también la primera fecha de cobro
   const proxima = fechas[0];
-  await supabase
+  await supabaseClient
     .from("estudiantes")
     .update({ proxima_mensualidad: proxima })
     .eq("id", estudiante.id);
@@ -41,7 +41,7 @@ async function generarCalendarioInicial(estudiante) {
 /** Extiende el calendario si quedan pocos eventos futuros programados. */
 async function extenderCalendarioSiNecesario(estudiante) {
   const hoyISO = toISODate(new Date());
-  const { data: futuros } = await supabase
+  const { data: futuros } = await supabaseClient
     .from("eventos_calendario")
     .select("fecha")
     .eq("estudiante_id", estudiante.id)
@@ -72,7 +72,7 @@ async function extenderCalendarioSiNecesario(estudiante) {
 
 /** Marca una clase como "Asistió". No afecta la mensualidad. */
 async function registrarAsistencia(evento, estudiante) {
-  await supabase
+  await supabaseClient
     .from("eventos_calendario")
     .update({ estado: "asistio" })
     .eq("id", evento.id);
@@ -83,7 +83,7 @@ async function registrarAsistencia(evento, estudiante) {
 
 /** Marca una clase como "Falta". No genera reposición ni modifica la mensualidad. */
 async function registrarFalta(evento, estudiante) {
-  await supabase
+  await supabaseClient
     .from("eventos_calendario")
     .update({ estado: "falta" })
     .eq("id", evento.id);
@@ -100,7 +100,7 @@ async function registrarFalta(evento, estudiante) {
  *     exactamente una clase dentro del horario real (nunca días fijos).
  */
 async function registrarPermiso(evento, estudiante, conReposicion) {
-  await supabase
+  await supabaseClient
     .from("eventos_calendario")
     .update({ estado: "permiso" })
     .eq("id", evento.id);
@@ -112,7 +112,7 @@ async function registrarPermiso(evento, estudiante, conReposicion) {
   if (!conReposicion) return;
 
   // 1) Buscar la última fecha ya programada para no chocar con otro evento
-  const { data: futuros } = await supabase
+  const { data: futuros } = await supabaseClient
     .from("eventos_calendario")
     .select("fecha")
     .eq("estudiante_id", estudiante.id)
@@ -139,7 +139,7 @@ async function registrarPermiso(evento, estudiante, conReposicion) {
   const proximaActual = estudiante.proxima_mensualidad || evento.fecha;
   const nuevaProxima = siguienteFechaClase(proximaActual, estudiante.dias_clase);
   if (nuevaProxima) {
-    await supabase
+    await supabaseClient
       .from("estudiantes")
       .update({ proxima_mensualidad: nuevaProxima })
       .eq("id", estudiante.id);

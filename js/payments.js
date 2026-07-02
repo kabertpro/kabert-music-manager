@@ -12,12 +12,12 @@ async function registrarPago(estudiante, monto, tipo, observaciones) {
   const nuevoSaldo = Math.max(deudaActual - Number(monto), 0);
 
   // Número de recibo correlativo
-  const { count } = await supabase
+  const { count } = await supabaseClient
     .from("pagos")
     .select("id", { count: "exact", head: true });
   const numeroRecibo = generarNumeroRecibo((count || 0) + 1);
 
-  const { data: pago, error } = await supabase
+  const { data: pago, error } = await supabaseClient
     .from("pagos")
     .insert({
       estudiante_id: estudiante.id,

@@ -57,7 +57,7 @@ async function renderHorariosView() {
   el.innerHTML = `<div class="empty-state">Cargando horarios…</div>`;
 
   const hoyISO = toISODate(new Date());
-  const { data: eventos } = await supabase
+  const { data: eventos } = await supabaseClient
     .from("eventos_calendario")
     .select("*")
     .eq("estudiante_id", e.id)
